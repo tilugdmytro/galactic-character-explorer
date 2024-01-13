@@ -1,5 +1,4 @@
-/* eslint-disable no-console */
-import React, { useContext } from 'react';
+import React from 'react';
 import { useSearchParams } from 'react-router-dom';
 import {
   Drawer,
@@ -16,7 +15,7 @@ import {
   IconButton,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import { GlobalContext } from '../utils/GlobalProvider';
+import { useAppSelector } from '../app/hooks';
 
 interface Props {
   open: boolean;
@@ -26,7 +25,7 @@ interface Props {
 const GENDERS = ['Male', 'Female', 'Other'];
 
 export const SideBar: React.FC<Props> = ({ open, onClose }) => {
-  const { movies } = useContext(GlobalContext);
+  const movies = useAppSelector((state) => state.movies.data);
 
   const [searchParams, setSearchParams] = useSearchParams();
   const gender = searchParams.get('gender') || '';

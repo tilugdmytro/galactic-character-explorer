@@ -7,25 +7,29 @@ import { NotFound } from './pages/NotFound';
 import { CharacterDetails } from './pages/CharacterDetails';
 import { theme } from './ui/theme';
 import PrimarySearchAppBar from './features/AppBar';
-import { GlobalProvider } from './utils/GlobalProvider';
 
 export const App: React.FC = () => {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <GlobalProvider>
-        <PrimarySearchAppBar />
-        <Container sx={{ padding: 12 }}>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route
-              path="/character/:characterId"
-              element={<CharacterDetails />}
-            />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Container>
-      </GlobalProvider>
+      <PrimarySearchAppBar />
+      <Container
+        sx={{
+          padding: 10,
+          '@media (max-width: 600px)': {
+            padding: '60px 20px',
+          },
+        }}
+      >
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route
+            path="/character/:characterId"
+            element={<CharacterDetails />}
+          />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </Container>
     </ThemeProvider>
   );
 };

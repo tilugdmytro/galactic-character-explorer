@@ -12,6 +12,7 @@ export const getData = async <T>(url: string, useBaseUrl = true): Promise<T> => 
 
     return response.json() as T;
   } catch (error) {
+    console.error(error)
     throw new Error(`Fetch error: ${error}`);
   }
 };

@@ -10,7 +10,7 @@ import {
   Divider,
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { getCharacterById } from '../api/getData';
+import { getCharacterById } from '../api/apiService';
 import { CustomLink } from '../features/CustomLink';
 import { Character } from '../types/Character';
 import { Species } from '../types/Species';
@@ -38,7 +38,7 @@ export const CharacterItem = () => {
           if (characterData.species.length > 0 && isMounted) {
             try {
               const speciesData = await Promise.all(
-                characterData.species.map(url => getData<Species>(url, false)),
+                characterData.species.map((url) => getData<Species>(url, false))
               );
 
               setSpecies(speciesData);
@@ -50,7 +50,7 @@ export const CharacterItem = () => {
           if (characterData.films.length > 0 && isMounted) {
             try {
               const filmsData = await Promise.all(
-                characterData.films.map(url => getData<Movie>(url, false)),
+                characterData.films.map((url) => getData<Movie>(url, false))
               );
 
               setMovies(filmsData);
@@ -62,7 +62,9 @@ export const CharacterItem = () => {
           if (characterData.starships.length > 0 && isMounted) {
             try {
               const starshipsData = await Promise.all(
-                characterData.starships.map(url => getData<Spaceship>(url, false)),
+                characterData.starships.map((url) =>
+                  getData<Spaceship>(url, false)
+                )
               );
 
               setSpaceships(starshipsData);
@@ -117,21 +119,23 @@ export const CharacterItem = () => {
                 {character?.name}
               </Typography>
               <Divider sx={{ borderColor: 'secondary.main', mb: 2 }} />
-              <InfoList
-                title="Species"
-                items={species.map((s) => ({ name: s.name }))}
-                itemKey="name"
-              />
-              <InfoList
-                title="Movies"
-                items={movies.map((m) => ({ title: m.title }))}
-                itemKey="title"
-              />
-              <InfoList
-                title="Spaceships"
-                items={spaceships.map((s) => ({ name: s.name }))}
-                itemKey="name"
-              />
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: "20px" }}>
+                <InfoList
+                  title="Species"
+                  items={species.map((s) => ({ name: s.name }))}
+                  itemKey="name"
+                />
+                <InfoList
+                  title="Movies"
+                  items={movies.map((m) => ({ title: m.title }))}
+                  itemKey="title"
+                />
+                <InfoList
+                  title="Spaceships"
+                  items={spaceships.map((s) => ({ name: s.name }))}
+                  itemKey="name"
+                />
+              </Box>
             </CardContent>
           </Card>
         </Box>

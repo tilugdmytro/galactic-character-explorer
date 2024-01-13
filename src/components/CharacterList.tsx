@@ -1,20 +1,18 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import {
-  Grid, LinearProgress, Typography, ListItemText,
-} from '@mui/material';
-import { getAllPeople } from '../api/getData';
+import { Grid, LinearProgress, Typography, ListItemText } from '@mui/material';
+import { getAllPeople } from '../api/apiService';
 import { Character } from '../types/Character';
 import { People } from '../types/People';
 import { CharacterCard } from './CharacterCard';
 import { filterPeople } from '../utils/filterPeople';
-import { GlobalContext } from '../utils/GlobalProvider';
+import { useAppSelector } from '../app/hooks';
 
 export const CharacterList = () => {
   const [people, setPeople] = useState<Character[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const { movies } = useContext(GlobalContext);
+  const movies = useAppSelector((state) => state.movies.data);
 
   const [searchParams] = useSearchParams();
   const query = searchParams.get('query') || '';
@@ -25,8 +23,8 @@ export const CharacterList = () => {
 
   const processPeopleData = (data: People): Character[] => {
     setPeople((prevPeople) => {
-      const lastId
-        = prevPeople.length > 0 ? prevPeople[prevPeople.length - 1].id : 0;
+      const lastId =
+        prevPeople.length > 0 ? prevPeople[prevPeople.length - 1].id : 0;
 
       return [
         ...prevPeople,
@@ -48,7 +46,7 @@ export const CharacterList = () => {
         while (nextUrl) {
           // eslint-disable-next-line no-await-in-loop
           const data: People = await getAllPeople(
-            nextUrl.replace('https://swapi.dev/api', ''),
+            nextUrl.replace('https://swapi.dev/api', '')
           );
 
           processPeopleData(data);
@@ -66,7 +64,13 @@ export const CharacterList = () => {
   }, []);
 
   const filteredPeople = filterPeople({
-    people, query, gender, minMass, maxMass, movie, movies,
+    people,
+    query,
+    gender,
+    minMass,
+    maxMass,
+    movie,
+    movies,
   });
 
   return (

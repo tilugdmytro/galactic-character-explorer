@@ -13,6 +13,7 @@ export const CharacterCard: React.FC<CharacterCardProps> = ({ person }) => {
       <Card
         sx={{
           height: '100%',
+          borderRadius: 4,
           transition: 'transform 0.25s',
           '&:hover': {
             transform: 'scale(1.04)',

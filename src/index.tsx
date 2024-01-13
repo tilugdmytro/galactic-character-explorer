@@ -7,8 +7,8 @@ import reportWebVitals from './reportWebVitals';
 import './index.css';
 import { App } from './App';
 
-const isGitHubPages
-  = process.env.NODE_ENV === 'production' && process.env.PUBLIC_URL;
+const isGitHubPages =
+  process.env.NODE_ENV === 'production' && process.env.PUBLIC_URL;
 
 const basename = isGitHubPages ? '/galactic-character-explorer' : '/';
 
