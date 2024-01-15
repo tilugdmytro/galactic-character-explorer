@@ -49,7 +49,6 @@ export const CharacterList = () => {
 
     
     fetchData().finally(() => setIsLoading(false));
-    return (() => console.log('unmount'))
   }, []);
 
   const filteredPeople = filterPeople({
