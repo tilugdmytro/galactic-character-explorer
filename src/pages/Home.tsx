@@ -8,8 +8,13 @@ import { fetchMoviesFailure, fetchMoviesStart, fetchMoviesSuccess } from '../red
 export const Home: React.FC = () => {
   const dispatch = useAppDispatch();
   const error = useAppSelector((state) => state.movies.error);
+  const movies = useAppSelector((state) => state.movies.data);
 
   useEffect(() => {
+    if (movies.length > 0) {
+      return;
+    }
+  
     const fetchData = async () => {
       try {
         dispatch(fetchMoviesStart());
@@ -24,7 +29,7 @@ export const Home: React.FC = () => {
     };
 
     fetchData();
-  }, [dispatch]);
+  }, [dispatch, movies.length]);
 
   if (error) {
     return <div>{error}</div>;

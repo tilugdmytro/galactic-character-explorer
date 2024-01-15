@@ -2,17 +2,19 @@ import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Grid, LinearProgress, Typography, ListItemText } from '@mui/material';
 import { getAllPeople } from '../api/apiService';
-import { Character } from '../types/Character';
 import { People } from '../types/People';
 import { CharacterCard } from './CharacterCard';
 import { filterPeople } from '../utils/filterPeople';
-import { useAppSelector } from '../app/hooks';
+import { useAppDispatch, useAppSelector } from '../app/hooks';
+import { selectPeople, selectPeopleError } from '../redux/peopleSlice';
+import {
+  fetchCharactersStart,
+  fetchCharactersSuccess,
+  fetchCharactersFailure,
+} from '../redux/peopleSlice';
 
 export const CharacterList = () => {
-  const [people, setPeople] = useState<Character[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-
-  const movies = useAppSelector((state) => state.movies.data);
 
   const [searchParams] = useSearchParams();
   const query = searchParams.get('query') || '';
@@ -21,35 +23,39 @@ export const CharacterList = () => {
   const minMass = searchParams.get('minMass') || '';
   const maxMass = searchParams.get('maxMass') || '';
 
-  const processPeopleData = (data: People): void => {
-    setPeople((prevPeople) => [
-      ...prevPeople,
-      ...data.results.map((value) => ({ ...value })),
-    ]);
-  };
+  const dispatch = useAppDispatch();
+  const people = useAppSelector(selectPeople);
+  const error = useAppSelector(selectPeopleError);
+  const movies = useAppSelector((state) => state.movies.data);
 
   useEffect(() => {
+    if (people.length > 0) {
+      setIsLoading(false);
+      return;
+    }
+
     const fetchData = async () => {
       try {
+        dispatch(fetchCharactersStart());
+
         let nextUrl: string | null = 'https://swapi.dev/api/people';
 
         while (nextUrl) {
-          const data: People = await getAllPeople(nextUrl)
+          const data: People = await getAllPeople(nextUrl);
 
-          processPeopleData(data);
+          dispatch(fetchCharactersSuccess(data.results));
 
           nextUrl = data.next;
         }
-      } catch (error) {
+      } catch (error: any) {
+        dispatch(fetchCharactersFailure(error.message));
         console.error(`Error fetching people: ${error}`);
-      } finally {
-        setIsLoading(false);
       }
     };
 
-    
     fetchData().finally(() => setIsLoading(false));
-  }, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch]);
 
   const filteredPeople = filterPeople({
     people,
@@ -63,6 +69,11 @@ export const CharacterList = () => {
 
   return (
     <>
+      {error && (
+        <Typography variant="h6" gutterBottom color="error">
+          Error: {error}
+        </Typography>
+      )}
       {isLoading && (
         <ListItemText>
           <Typography variant="h6" gutterBottom>
@@ -72,7 +83,7 @@ export const CharacterList = () => {
         </ListItemText>
       )}
       <>
-        {!isLoading && filteredPeople.length === 0 ? (
+        {!isLoading && !error && filteredPeople.length === 0 ? (
           <Typography variant="h6" gutterBottom>
             No matching results found...
           </Typography>
