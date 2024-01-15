@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Grid, LinearProgress, Typography, ListItemText } from '@mui/material';
+import {
+  Grid,
+  Typography,
+  ListItemText,
+} from '@mui/material';
 import { getAllPeople } from '../api/apiService';
 import { People } from '../types/People';
 import { CharacterCard } from './CharacterCard';
@@ -12,9 +16,11 @@ import {
   fetchCharactersSuccess,
   fetchCharactersFailure,
 } from '../redux/peopleSlice';
+import { Loader } from '../features/Loader';
 
 export const CharacterList = () => {
   const [isLoading, setIsLoading] = useState(true);
+  const [progress, setProgress] = useState(0);
 
   const [searchParams] = useSearchParams();
   const query = searchParams.get('query') || '';
@@ -42,8 +48,15 @@ export const CharacterList = () => {
 
         while (nextUrl) {
           const data: People = await getAllPeople(nextUrl);
+          const fetchedCharacters = data.results.length;
 
           dispatch(fetchCharactersSuccess(data.results));
+
+          setProgress((prevProgress) => {
+            const newProgress =
+              prevProgress + (fetchedCharacters / data.count) * 100;
+            return newProgress > 100 ? 100 : newProgress;
+          });
 
           nextUrl = data.next;
         }
@@ -54,7 +67,7 @@ export const CharacterList = () => {
     };
 
     fetchData().finally(() => setIsLoading(false));
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch]);
 
   const filteredPeople = filterPeople({
@@ -79,7 +92,7 @@ export const CharacterList = () => {
           <Typography variant="h6" gutterBottom>
             Please wait until all characters come together...
           </Typography>
-          <LinearProgress color="secondary" sx={{ mb: 2 }} />
+          <Loader value={progress} />
         </ListItemText>
       )}
       <>
