@@ -21,46 +21,35 @@ export const CharacterList = () => {
   const minMass = searchParams.get('minMass') || '';
   const maxMass = searchParams.get('maxMass') || '';
 
-  const processPeopleData = (data: People): Character[] => {
-    setPeople((prevPeople) => {
-      const lastId =
-        prevPeople.length > 0 ? prevPeople[prevPeople.length - 1].id : 0;
-
-      return [
-        ...prevPeople,
-        ...Object.values(data.results).map((value, index) => ({
-          ...value,
-          id: lastId + index + 1,
-        })),
-      ];
-    });
-
-    return [];
+  const processPeopleData = (data: People): void => {
+    setPeople((prevPeople) => [
+      ...prevPeople,
+      ...data.results.map((value) => ({ ...value })),
+    ]);
   };
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        let nextUrl: string | null = '/people';
+        let nextUrl: string | null = 'https://swapi.dev/api/people';
 
         while (nextUrl) {
-          // eslint-disable-next-line no-await-in-loop
-          const data: People = await getAllPeople(
-            nextUrl.replace('https://swapi.dev/api', '')
-          );
+          const data: People = await getAllPeople(nextUrl)
 
           processPeopleData(data);
 
           nextUrl = data.next;
         }
       } catch (error) {
-        throw new Error(`Error fetching people: ${error}`);
+        console.error(`Error fetching people: ${error}`);
       } finally {
         setIsLoading(false);
       }
     };
 
+    
     fetchData().finally(() => setIsLoading(false));
+    return (() => console.log('unmount'))
   }, []);
 
   const filteredPeople = filterPeople({
@@ -83,7 +72,7 @@ export const CharacterList = () => {
           <LinearProgress color="secondary" sx={{ mb: 2 }} />
         </ListItemText>
       )}
-      <div>
+      <>
         {!isLoading && filteredPeople.length === 0 ? (
           <Typography variant="h6" gutterBottom>
             No matching results found...
@@ -91,13 +80,13 @@ export const CharacterList = () => {
         ) : (
           <Grid container spacing={2}>
             {filteredPeople.map((person) => (
-              <Grid item key={person.id} xs={12} sm={4} md={4} lg={3}>
+              <Grid item key={person.name} xs={12} sm={4} md={4} lg={3}>
                 <CharacterCard person={person} />
               </Grid>
             ))}
           </Grid>
         )}
-      </div>
+      </>
     </>
   );
 };

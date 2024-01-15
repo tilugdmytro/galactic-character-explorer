@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import React, { useEffect } from 'react';
 import { CharacterList } from '../components/CharacterList';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
@@ -30,6 +29,7 @@ export const Home: React.FC = () => {
   if (error) {
     return <div>{error}</div>;
   }
+  
   return (
     <CharacterList />
   )

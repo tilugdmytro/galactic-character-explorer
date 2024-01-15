@@ -8,8 +8,11 @@ interface CharacterCardProps {
 }
 
 export const CharacterCard: React.FC<CharacterCardProps> = ({ person }) => {
+  const parts = person.url.split('/');
+  const urlId = parts[parts.length - 2];
+
   return (
-    <CustomLink to={`/character/${person.id}`}>
+    <CustomLink to={`/character/${urlId}`}>
       <Card
         sx={{
           height: '100%',

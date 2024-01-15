@@ -33,7 +33,7 @@ export const CharacterItem = () => {
     const fetchData = async () => {
       try {
         if (characterId && isMounted) {
-          const characterData = await getCharacterById(+characterId);
+          const characterData = await getCharacterById(characterId);
 
           if (characterData.species.length > 0 && isMounted) {
             try {

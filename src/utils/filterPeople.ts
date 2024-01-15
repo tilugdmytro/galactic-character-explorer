@@ -14,6 +14,7 @@ interface FilterPeopleParams {
 export const filterPeople = ({
   people, query, gender, minMass, maxMass, movie, movies,
 }: FilterPeopleParams) => {
+  
   let result = [...people];
 
   if (query) {

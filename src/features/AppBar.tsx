@@ -49,6 +49,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
+
 export default function PrimarySearchAppBar() {
   const [drawerOpen, setDrawerOpen] = useState(false);
 
