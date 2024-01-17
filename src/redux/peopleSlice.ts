@@ -5,11 +5,13 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 interface PeopleState {
   data: Character[];
   error: string | null;
+  loading: boolean;
 }
 
 const initialState: PeopleState = {
   data: [],
   error: null,
+  loading: false,
 };
 
 const peopleSlice = createSlice({
@@ -17,6 +19,7 @@ const peopleSlice = createSlice({
   initialState,
   reducers: {
     fetchCharactersStart: (state) => {
+      state.loading = true;
       state.error = null;
     },
     fetchCharactersSuccess: (state, action: PayloadAction<Character[]>) => {
@@ -25,6 +28,10 @@ const peopleSlice = createSlice({
     },
     fetchCharactersFailure: (state, action: PayloadAction<string>) => {
       state.error = action.payload;
+      state.loading = false;
+    },
+    fetchCharactersComplete: (state) => {
+      state.loading = false;
     },
   },
 });
@@ -33,6 +40,7 @@ export const {
   fetchCharactersStart,
   fetchCharactersSuccess,
   fetchCharactersFailure,
+  fetchCharactersComplete,
 } = peopleSlice.actions;
 
 export const selectPeople = (state: RootState) => state.people.data;

@@ -1,25 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import {
-  Grid,
-  Typography,
-  ListItemText,
-} from '@mui/material';
+import { Grid, Typography, ListItemText } from '@mui/material';
 import { getAllPeople } from '../api/apiService';
 import { People } from '../types/People';
 import { CharacterCard } from './CharacterCard';
 import { filterPeople } from '../utils/filterPeople';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
-import { selectPeople, selectPeopleError } from '../redux/peopleSlice';
 import {
   fetchCharactersStart,
   fetchCharactersSuccess,
   fetchCharactersFailure,
+  fetchCharactersComplete,
 } from '../redux/peopleSlice';
 import { Loader } from '../features/Loader';
 
 export const CharacterList = () => {
-  const [isLoading, setIsLoading] = useState(true);
   const [progress, setProgress] = useState(0);
 
   const [searchParams] = useSearchParams();
@@ -30,13 +25,15 @@ export const CharacterList = () => {
   const maxMass = searchParams.get('maxMass') || '';
 
   const dispatch = useAppDispatch();
-  const people = useAppSelector(selectPeople);
-  const error = useAppSelector(selectPeopleError);
+  const {
+    data: people,
+    error,
+    loading,
+  } = useAppSelector((state) => state.people);
   const movies = useAppSelector((state) => state.movies.data);
 
   useEffect(() => {
     if (people.length > 0) {
-      setIsLoading(false);
       return;
     }
 
@@ -63,10 +60,12 @@ export const CharacterList = () => {
       } catch (error: any) {
         dispatch(fetchCharactersFailure(error.message));
         console.error(`Error fetching people: ${error}`);
+      } finally {
+        dispatch(fetchCharactersComplete());
       }
     };
 
-    fetchData().finally(() => setIsLoading(false));
+    fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch]);
 
@@ -87,7 +86,7 @@ export const CharacterList = () => {
           Error: {error}
         </Typography>
       )}
-      {isLoading && (
+      {loading && (
         <ListItemText>
           <Typography variant="h6" gutterBottom>
             Please wait until all characters come together...
@@ -95,21 +94,19 @@ export const CharacterList = () => {
           <Loader value={progress} />
         </ListItemText>
       )}
-      <>
-        {!isLoading && !error && filteredPeople.length === 0 ? (
-          <Typography variant="h6" gutterBottom>
-            No matching results found...
-          </Typography>
-        ) : (
-          <Grid container spacing={2}>
-            {filteredPeople.map((person) => (
-              <Grid item key={person.name} xs={12} sm={4} md={4} lg={3}>
-                <CharacterCard person={person} />
-              </Grid>
-            ))}
-          </Grid>
-        )}
-      </>
+      {!loading && !error && filteredPeople.length === 0 ? (
+        <Typography variant="h6" gutterBottom>
+          No matching results found...
+        </Typography>
+      ) : (
+        <Grid container spacing={2}>
+          {filteredPeople.map((person) => (
+            <Grid item xs={12} sm={4} md={4} lg={3}>
+              <CharacterCard person={person} />
+            </Grid>
+          ))}
+        </Grid>
+      )}
     </>
   );
 };
